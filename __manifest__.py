@@ -28,7 +28,7 @@
     'license': 'LGPL-3',
 
     # Dependencias
-    'depends': ['base', 'stock', 'delivery'],
+    'depends': ['base', 'stock', 'delivery', 'l10n_mx_edi_stock_30'],
 
     # Archivos de datos
     'data': [
