@@ -1,0 +1,750 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="letter_delivery_pdf">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.basic_layout">
+                        <t t-set="o" t-value="o.with_context(lang=lang)"/>
+                        <style>
+                            td {
+                                padding: 5px; /* Aplica padding a todas las celdas */
+                            }
+                            th {
+                                padding: 5px; /* Aplica padding a los encabezados */
+                            }
+                            .cp-data { font-size: 11pt; line-height: 1.1; }
+                            hr { margin: 10px 0 5px; padding: 0; }
+                        </style>
+                        <div class="body">
+                            <t t-set="cartaporte_values" t-value="o._l10n_mx_edi_get_cartaporte_pdf_values()"/>
+                            <t t-set="cfdi_values" t-value="o._l10n_mx_edi_get_extra_picking_report_values()"/>
+                            <table style="width:100%; border:1px transparent solid">
+                                <tr>
+                                    <td colspan="2">
+                                        <b>
+                                            <t t-esc="o.partner_id.name"/>
+                                        </b>
+                                    </td>
+                                    <td style="background:#212f3d; color:#FFFFFF; text-align:center">
+                                        <b>
+                                            Carta Porte - Traslado
+                                        </b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Régimen Fiscal:
+                                    </td>
+                                    <td>
+                                        <span t-out="cfdi_values['fiscal_regime']"/>
+                                    </td>
+                                    <td style="text-align:center">
+                                        Fecha Timbrado
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Lugar de expedición:
+                                    </td>
+                                    <td>
+                                        <span t-out="cfdi_values['expedition']"/>
+                                    </td>
+                                    <td>
+                                        <span t-out="cfdi_values['stamp_date']"/>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        Domicilio:
+                                    </td>
+                                    <td>
+                                        <t t-esc="o.company_id.street if o.company_id.street else ''"/> <t t-esc="o.company_id.city if o.company_id.city else ''"/> <t t-esc="o.company_id.state_id.name if o.company_id.state_id else ''"/> <t t-esc="o.company_id.country_id.name if o.company_id.country_id else ''"/> <t t-esc="o.company_id.zip if o.company_id.zip else ''"/>
+                                    </td>
+                                    <td style="text-align:center">
+                                        Fecha Emision                                        
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                    </td>
+                                    <td>
+                                        <span t-out="cfdi_values['emission_date_str']"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <table style="width:100%; border: 1px solid black; border-collapse: collapse;">
+                                <tr style="border: 1px solid Transparent">
+                                    <td colspan="2" style="text-align:center; background:#212f3d; color: #FFFFFF; border: none;">
+                                        <b>DATOS DEL CLIENTE</b>
+                                    </td>
+                                    <td style="text-align:center; border-top: 1px solid black; border-right: 1px solid black; border-left: 1px solid black">
+                                        <b>Folio Fiscal</b>
+                                    </td>
+                                </tr>
+                                <tr style="border: 1px solid Transparent">
+                                    <td style="border-left: 1px solid black;">Nombre:</td>
+                                    <td style="border-right: 1px solid black">
+                                        <t t-esc="o.partner_id.name if o.partner_id else '' "/>
+                                    </td>
+                                    <td style="border-right: 1px solid black; text-align:center">
+                                        <t t-esc="o.l10n_mx_edi_cfdi_uuid if o.l10n_mx_edi_cfdi_uuid else '' " />
+                                    </td>
+                                </tr>
+                                <tr style="border: 1px solid Transparent">
+                                    <td style="border-left: 1px solid black;">RFC</td>
+                                    <td style="border-right: 1px solid black">
+                                        <t t-esc="o.partner_id.vat if o.partner_id.vat else '' "/>
+                                    </td>
+                                    <td style="text-align:center; border-right: 1px solid black;">
+                                        <b>No. Certificado Digital</b>
+                                    </td>
+                                </tr>
+                                <tr style="border: 1px solid Transparent">
+                                    <td style="border-left: 1px solid black;">Tax Id Number:</td>
+                                    <td style="border-right: 1px solid black"></td>
+                                    <td style="text-align:center; border-right: 1px solid black;">
+                                        <span t-out="cfdi_values['certificate_number']"/>
+                                    </td>
+                                </tr>
+                                <tr style="border: 1px solid Transparent">
+                                    <td style="border-left: 1px solid black;">Domicilio:</td>
+                                    <td style="border-right: 1px solid black">
+                                        <t t-esc="o.partner_id.street if o.partner_id.street else ''"/> 
+                                        <t t-esc="o.partner_id.city if o.partner_id.city else ''"/> 
+                                        <t t-esc="o.partner_id.state_id.name if o.partner_id.state_id else ''"/> 
+                                        <t t-esc="o.partner_id.country_id.name if o.partner_id.country_id else ''"/> 
+                                        <t t-esc="o.partner_id.zip if o.partner_id.zip else ''"/>
+                                    </td>
+                                    <td style="text-align:center; border-right: 1px solid black;">
+                                        <b>No. Certificado SAT</b>
+                                    </td>
+                                </tr>
+                                <tr style="border-top: 1px solid Transparent">
+                                    <td colspan="2" style="border: none;"></td>
+                                    <td style="text-align:center; border-right: 1px solid black;">
+                                        <span t-out="cfdi_values['certificate_sat_number']"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <table style="width:100%; border: 1px solid transparent">
+                                <tr style="background:#212f3d; color: #FFFFFF; text-align:center">
+                                    <td colspan="5">
+                                        DATOS DEL COMPROBANTE
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border-left: 1px solid black">
+                                        <b>
+                                            Método de pago
+                                        </b>
+                                    </td>
+                                    <td style="border-right: 1px solid black">
+                                        <b>
+                                            Uso de Cfdi
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <b>
+                                            Moneda
+                                        </b>
+                                    </td>
+                                    <td>
+                                    </td>                           
+                                    <td style="border-right: 1px solid black">
+                                        <b>
+                                            Tipo de Cambio
+                                        </b>                                        
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border-left: 1px solid black">    
+                                    </td>
+                                    <td style="border-right: 1px solid black">
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                    </td>                           
+                                    <td style="border-right: 1px solid black">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border-left: 1px solid black">
+                                        <b>
+                                            Forma de pago
+                                        </b>
+                                    </td>
+                                    <td style="border-right: 1px solid black">
+                                        <b>
+                                            Tipo de comprobante
+                                        </b>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                    </td>                           
+                                    <td style="border-right: 1px solid black">
+                                    </td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid black">
+                                    <td style="border-left: 1px solid black">    
+                                    </td>
+                                    <td style="border-right: 1px solid black">
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                    </td>                           
+                                    <td style="border-right: 1px solid black">
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table style="width:100%; border: 1px solid transparent">
+                                <tr style="text-align:center">
+                                    <td>
+                                        <b>
+                                            Medio de transporte
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <b>
+                                            Transporte Internacional 
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <b>
+                                            Tipo de Transporte Internacional
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <b>
+                                            Vía de Transporte Internacional
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <b>
+                                            País de origen o destino
+                                        </b>
+                                    </td>
+                                </tr>
+                                <tr style="text-align:center">
+                                    <td>
+                                    </td>
+                                    <td>
+                                        <t t-out="cartaporte_values['transp_internac']"/>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                        <t t-out="cartaporte_values['pais_origen_destino']"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <b>
+                                            Total de distancia recorrida: 
+                                        </b>
+                                    </td>
+                                    <td colspan="3">
+                                        <t t-out="cartaporte_values['total_dist_recorrida']"/> Km
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <b>
+                                            Tipo Autotransporte:
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <t t-out="cartaporte_values['config_vehicular']"/>
+                                    </td>
+                                    <td>
+                                        <b>
+                                            Permiso SCT:
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <t t-out="cartaporte_values['transport_perm_sct']"/>
+                                    </td>
+                                </tr>
+
+                            </table>
+
+                            <table style="width:100%; border:1px solid transparent; border-collapse: collapse;">
+                                <tr style="text-align:center; padding:15px;">
+                                    <td>
+                                        <b>Número de Permiso</b>
+                                    </td>
+                                    <td>
+                                        <b>Placa</b>
+                                    </td>
+                                    <td>
+                                        <b>Año</b>
+                                    </td>
+                                    <td>
+                                        <b>Aseguradora resp. civil</b>
+                                    </td>
+                                    <td>
+                                        <b>Póliza resp. civil</b>
+                                    </td>
+                                    <td>
+                                        <b>Aseguradora med. amb.</b>
+                                    </td>
+                                    <td>
+                                        <b>Póliza med. amb.</b>
+                                    </td>
+                                </tr>
+                                <tr style="text-align:center; padding:5px;">
+                                    <td style="padding:5px">
+                                        <t t-out="cartaporte_values['num_permiso_sct']"/>
+                                    </td>
+                                    <td style="padding:5px">
+                                        <t t-out="cartaporte_values['placa_vm']"/>
+                                    </td>
+                                    <td style="padding:5px">
+                                        <t t-out="cartaporte_values['anio_modelo_vm']"/>
+                                    </td>
+                                    <td style="padding:5px">
+                                        <t t-out="cartaporte_values['asegura_resp_civil']"/>
+                                    </td>
+                                    <td style="padding:5px">
+                                        <t t-out="cartaporte_values['poliza_resp_civil']"/>
+                                    </td>
+                                    <td style="padding:5px">
+                                        <t t-esc="o.l10n_mx_edi_vehicle_id.environment_insurer if o.l10n_mx_edi_vehicle_id else ''"/>
+                                    </td>
+                                    <td style="padding:5px">
+                                        <t t-esc="o.l10n_mx_edi_vehicle_id.environment_insurance_policy if o.l10n_mx_edi_vehicle_id else ''"/>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table style="width:100%; border:1px solid transparent">
+                                <tr>
+                                    <td>
+                                        <b>
+                                            Aseguradora carga
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <b>
+                                            Póliza carga
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <b>
+                                            Prima seguro
+                                        </b>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table  style="width:100%; border:1px solid transparent">
+                                <tr>
+                                    <td>
+                                        <b>
+                                            Remolque
+                                        </b>
+                                    </td>
+                                    <td>
+                                        
+                                    </td>
+                                    <td>
+                                        <b>
+                                            Placa
+                                        </b>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <br/>
+                            <table style="width:100%; border: 1px solid transparent; border-collapse: collapse;">
+                                <thead>
+                                    <!-- Fila del super título "MERCANCÍAS" -->
+                                    <tr>
+                                        <th colspan="6" style="text-align:center; border: 1px solid transparent;">
+                                            <b>MERCANCÍAS</b>
+                                        </th>
+                                    </tr>
+                                    <!-- Fila de encabezados de columnas -->
+                                    <tr style="background:#212f3d; color: #FFFFFF;text-align:center">
+                                        <th style="border: 1px solid black; padding: 5px;">Cantidad</th>
+                                        <th style="border: 1px solid black; padding: 5px;">Unidad</th>
+                                        <th style="border: 1px solid black; padding: 5px;">Descripción</th>
+                                        <th style="border: 1px solid black; padding: 5px;">Precio unitario</th>
+                                        <th style="border: 1px solid black; padding: 5px;">Impuestos</th>
+                                        <th style="border: 1px solid black; padding: 5px;">Importe</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Puedes agregar más filas de datos aquí -->
+                                    <!-- Iterar sobre las líneas de productos (move_ids_without_package) -->
+                                    <t t-foreach="o.move_ids_without_package" t-as="line">
+                                        <tr style="border:1px solid transparent">
+                                            <!-- Cantidad -->
+                                            <td style="padding: 5px; text-align:right">
+                                                <t t-esc="line.product_uom_qty"/>
+                                            </td>
+                                            <!-- Unidad -->
+                                            <td style="padding: 5px; text-align:center">
+                                                <t t-esc="line.product_uom.name"/>
+                                            </td>
+                                            <!-- Descripción -->
+                                            <td style="padding: 5px;">
+                                                <t t-esc="line.product_id.name"/>
+                                            </td>
+                                            <!-- Precio unitario -->
+                                            <td style="padding: 5px; text-align:right">
+                                                <t t-esc="line.product_id.lst_price"/>
+                                            </td>
+                                            <!-- Impuestos -->
+                                            <td style="padding: 5px;">
+                                                <!-- <t t-esc="', '.join(line.tax_id.mapped('name'))"/> -->
+                                                <t t-if="line.product_id.taxes_id">
+                                                    <t t-foreach="line.product_id.taxes_id" t-as="taxe">
+                                                        <t t-esc="taxe.name"/>
+                                                    </t>
+                                                </t>
+                                            </td>
+                                            <!-- Importe -->
+                                            <td style="padding: 5px; text-align:right">
+                                                <t t-esc="line.product_uom_qty * line.product_id.lst_price"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                </tbody>
+                            </table>
+                            <br/>
+
+                            <br/>
+                            <table style="width:100%; border: 1px solid transparent; border-collapse: collapse;">
+                                <thead>
+                                    <!-- Fila de encabezados de columnas -->
+                                    <tr style="background:#212f3d; color: #FFFFFF;text-align:center">
+                                        <th style="padding: 5px;">Cantidad</th>
+                                        <th style="padding: 5px;">Unidad</th>
+                                        <th style="padding: 5px;">Descripción</th>
+                                        <th style="padding: 5px;">Tipo de material peligroso</th>
+                                        <th style="padding: 5px;">Embalaje</th>
+                                        <th style="padding: 5px;">Peso Kg</th>
+                                        <th style="padding: 5px;">Fracción arancelaría</th>
+                                        <th style="padding: 5px;">Pedimento</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Puedes agregar más filas de datos aquí -->
+                                    <!-- Iterar sobre las líneas de productos (move_ids_without_package) -->
+                                    <t t-foreach="o.move_ids_without_package" t-as="line">
+                                        <tr style="border:1px solid transparent">
+                                            <!-- Cantidad -->
+                                            <td style="padding: 5px; text-align:right">
+                                                <t t-esc="line.product_uom_qty"/>
+                                            </td>
+                                            <!-- Unidad -->
+                                            <td style="padding: 5px; text-align:center">
+                                                <t t-esc="line.product_uom.name"/>
+                                            </td>
+                                            <!-- Descripción -->
+                                            <td style="padding: 5px;">
+                                                <t t-esc="line.product_id.name"/>
+                                            </td>
+                                            
+                                        </tr>
+                                    </t>
+
+                                </tbody>
+                            </table>
+                            
+                            <br/>
+                            <table style="width:100%; border:1px solid transparent">
+                                <tr style="padding-top:10px;">
+                                    <td>
+                                        <b>
+                                            Número de guía
+                                        </b>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                        <b>
+                                            Descripción guía
+                                        </b>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                        <b>
+                                            Peso guía
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <t t-esc="o.shipping_weight if o.shipping_weight else 0"/>
+                                    </td>
+                                </tr>
+                                <tr style="padding-top:10px">
+                                    <td>
+                                        <b>
+                                            Peso bruto total: 
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <t t-out="cartaporte_values['peso_bruto_total']"/> <t t-out="cartaporte_values['unidad_peso']"/>
+                                    </td>
+                                    <td>
+                                        <b>
+                                            Unidad de peso: 
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <t t-esc="o.weight_uom_name if o.weight_uom_name else ''"/>
+                                    </td>
+                                    <td>
+                                        <b>
+                                            Número total de mercancías: 
+                                        </b>
+                                    </td>
+                                    <td>
+                                        <t t-out="cartaporte_values['num_total_mercancias']"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br/>
+                            <b>
+                                Material Peligroso
+                            </b>
+                            <br/>
+                            <b>
+                                Embalaje
+                            </b>
+                            <br/>
+                            <table style="width:100%; border: 1px solid transparent; border-collapse: collapse;">
+                                <thead>
+                                    <!-- Fila del super título "MERCANCÍAS" -->
+                                    <tr>
+                                        <th colspan="6" style="text-align:center; border: 1px solid transparent;">
+                                            <b>REMITENTES Y DESTINATARIOS</b>
+                                        </th>
+                                    </tr>
+                                    <!-- Fila de encabezados de columnas -->
+                                    <tr style="background:#212f3d; color: #FFFFFF;text-align:center">
+                                        <th style="padding: 5px;">Tipo ubicación</th>
+                                        <th style="padding: 5px;">RFC</th>
+                                        <th style="padding: 5px;">Nombre</th>
+                                        <th style="padding: 5px;">Tax ID</th>
+                                        <th style="padding: 5px;">Residencia fiscal</th>
+                                        <th style="padding: 5px;">Fecha Salida/Llegada</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align:center">
+                                    <!-- Puedes agregar más filas de datos aquí -->
+                                    <tr>
+                                        <td>
+                                            <b>
+                                                Origen
+                                            </b>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['origen_ubicacion']['rfc_remitente_destinatario']"/>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['origen_ubicacion']['num_reg_id_trib']"/>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['origen_ubicacion']['residencia_fiscal']"/>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['origen_ubicacion']['fecha_hora_salida_llegada']"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Destino
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['destino_ubicacion']['rfc_remitente_destinatario']"/>
+                                        </td>
+                                        <td>
+                                            <!-- name -->
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['destino_ubicacion']['num_reg_id_trib']"/>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['destino_ubicacion']['residencia_fiscal']"/>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['destino_ubicacion']['fecha_hora_salida_llegada']"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br/><br/>
+                            <table style="width:100%; border: 1px solid transparent; border-collapse: collapse;">
+                                <thead>
+                                    <!-- Fila de encabezados de columnas -->
+                                    <tr style="text-align:center">
+                                        <th style="padding: 5px;">Direcciones</th>
+                                        <th style="padding: 5px;">Núm Ext.Núm Int</th>
+                                        <th style="padding: 5px;">Colonia</th>
+                                        <th style="padding: 5px;">Localidad</th>
+                                        <th style="padding: 5px;">Referencia</th>
+                                        <th style="padding: 5px;">Municipio</th>
+                                        <th style="padding: 5px;">Estado</th>
+                                        <th style="padding: 5px;">Pais</th>
+                                        <th style="padding: 5px;">Código postal</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align:center;">
+                                    <!-- Puedes agregar más filas de datos aquí -->
+                                    <tr>
+                                        <td>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['origen_domicilio']['municipio']"/>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['origen_domicilio']['estado']"/>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['origen_domicilio']['pais']"/>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['origen_domicilio']['codigo_postal']"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['destino_domicilio']['municipio']"/>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['destino_domicilio']['estado']"/>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['destino_domicilio']['pais']"/>
+                                        </td>
+                                        <td>
+                                            <t t-out="cartaporte_values['destino_domicilio']['codigo_postal']"/>
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+
+
+                            <br/><br/>
+                            <table style="width:100%; border: 1px solid transparent; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="6">
+                                            <b>
+                                                OPERADORES Y DATOS ADICIONALES
+                                            </b>
+                                        </th>
+                                    </tr>
+                                    <!-- Fila de encabezados de columnas -->
+                                    <tr style="text-align:center">
+                                        <th style="padding: 5px;">Tipo de figura</th>
+                                        <th style="padding: 5px;">RFC</th>
+                                        <th style="padding: 5px;">Nombre</th>
+                                        <th style="padding: 5px;">Licencia</th>
+                                        <th style="padding: 5px;">Tax ID</th>
+                                        <th style="padding: 5px;">Residencia fiscal</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="text-align:center;">
+                                    <!-- Puedes agregar más filas de datos aquí -->
+                                    <tr t-foreach="cartaporte_values['figures']" t-as="figure">
+                                        <td>
+                                            <t t-out="figure['tipo_figura']"/>
+                                        </td>
+                                        <td>
+
+                                        </td>
+                                        <td>
+
+                                        </td>
+                                        <td>
+                                            <t t-out="figure['num_licencia']"/>
+                                        </td>
+                                        <td>
+                                            <t t-out="figure['num_reg_id_trib_figura']"/>
+                                        </td>
+                                        <td>
+                                            <t t-out="figure['residencia_fiscal_figura']"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="row border-bottom mt-3 pt-2 pb-3" id='complement'>
+                                <div class="barcode col-3">
+                                    <img alt="Barcode" t-att-src="cfdi_values['barcode_src']"/>
+                                </div>
+                                <div class="complement-details col-9">
+                                    <div class="digital-stamp" style="background:#212f3d; color:#FFFFFF;">
+                                        <span>Cadena Original del Complemento de Certificación Digital del SAT</span>
+                                    </div>
+                                    <div class="digital-stamp-content">
+                                        <span class="nowrap" t-out="cfdi_values['cadena']"/>
+                                    </div>
+                                    <div class="digital-stamp" style="background:#212f3d; color:#FFFFFF;">
+                                        <span>Sello Digital del CFDI</span>
+                                    </div>
+                                    <div class="digital-stamp-content">
+                                        <span t-out="cfdi_values['sello']"/>
+                                    </div>
+                                    <div class="digital-stamp" style="background:#212f3d; color:#FFFFFF;">
+                                        <span>Sello del SAT</span>
+                                    </div>
+                                    <div class="digital-stamp-content">
+                                        <span t-out="cfdi_values['sello_sat']"/>
+                                    </div>
+                                    <div class="digital-stamp-content text-center">
+                                        <strong>This document is a printed representation of a CFDI</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>
