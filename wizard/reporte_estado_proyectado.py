@@ -28,7 +28,7 @@ class ReporteEstadoProyectado(models.TransientModel):
                     gastos_indirectos_opciones[cuenta_gasto.id] = gasto.name
                 lista_gastos_ids += gasto.cuenta_ids.ids
 
-            linea_analitica_ids = self.env["account.analytic.line"].search([("date",">=",fecha_inicio),("date","<=",fecha_fin),("x_plan2_id","=",cuenta_analitica_id.id),("general_account_id","in",lista_gastos_ids)])
+            linea_analitica_ids = self.env["account.analytic.line"].search([("date",">=",fecha_inicio),("date","<=",fecha_fin),("account_id","=",cuenta_analitica_id.id),("general_account_id","in",lista_gastos_ids)])
             if linea_analitica_ids:
                 for linea in linea_analitica_ids:
                     gasto = False
