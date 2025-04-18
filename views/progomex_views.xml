@@ -1,0 +1,87 @@
+<odoo>
+  <data>
+      
+        <record model="ir.ui.view" id="view_progomex_gasto_indirecto_form">
+            <field name="name">view.progomex.gasto.indirecto.form</field>
+            <field name="model">progomex.gasto_indirecto</field>
+            <field name="arch" type="xml">
+                <form string="Gasto indirecto">
+                    <group>
+                        <field name="sequence" invisible="1"/>
+                        <field name="name"/>
+                        <field name="cuenta_ids" widget="many2many_tags"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_progomex_gasto_administrativo_form">
+            <field name="name">view.progomex.gasto.administrativo.form</field>
+            <field name="model">progomex.gasto_administrativo</field>
+            <field name="arch" type="xml">
+                <form string="Gasto administrativo">
+                    <group>
+                        <field name="sequence" invisible="1"/>
+                        <field name="name"/>
+                        <field name="cuenta_ids" widget="many2many_tags"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+      
+        <record id="view_progomex_gasto_indirecto_tree" model="ir.ui.view">
+            <field name="name">view.progomex.gasto.indirecto.tree</field>
+            <field name="model">progomex.gasto_indirecto</field>
+            <field name="arch" type="xml">
+                <tree string="Gastos">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="cuenta_ids"/>
+                </tree>
+            </field>
+        </record>
+      
+        <record id="view_progomex_gasto_administrativo_tree" model="ir.ui.view">
+            <field name="name">view.progomex.gasto.administrativo.tree</field>
+            <field name="model">progomex.gasto_administrativo</field>
+            <field name="arch" type="xml">
+                <tree string="Gastos">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="cuenta_ids"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_gasto_administrativo" model="ir.actions.act_window">
+            <field name="name">Gastos administrativo</field>
+            <field name="res_model">progomex.gasto_administrativo</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Configura un gasto administrativo
+                </p>
+            </field>
+        </record>
+      
+        <record id="action_gasto_indirecto" model="ir.actions.act_window">
+            <field name="name">Gastos indirectos</field>
+            <field name="res_model">progomex.gasto_indirecto</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Configura un gasto indirecto
+                </p>
+            </field>
+        </record>
+      
+        <menuitem id="menu_progomex_reportes" parent="account.menu_finance_configuration" name="Reportes Progomex"/>
+      
+        <menuitem action="action_gasto_indirecto" id="menu_progomex_gasto_indirecto" name="Gastos indirectos" parent="progomex.menu_progomex_reportes"/>
+      
+        <menuitem action="action_gasto_administrativo" id="menu_progomex_gasto_administrativo" name="Gastos administrativos" parent="progomex.menu_progomex_reportes"/>
+      
+  </data>
+</odoo>

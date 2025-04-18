@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_progomex_reporte_estado_proyectado" model="ir.ui.view">
+            <field name="name">progomex.reporte.estado_proyectado</field>
+            <field name="model">progomex.reporte_estado_proyectado</field>
+            <field name="arch" type="xml">
+            <form string="Reporte Estado proyectado">
+                <group>
+                    <field name="fecha_inicio"/>
+                    <field name="fecha_fin"/>
+                    <field name="cuenta_analitica_id"/>
+                </group>
+                <group>
+                    <field name="name" invisible="1"/>
+                    <field name="archivo" readonly="1" filename="name"/>
+                </group>
+                <footer>
+                    <button name="print_report_excel" string="Reporte excel" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-default" special="cancel" />
+                </footer>
+            </form>
+            </field>
+    </record>
+
+    <record id="action_progomex_reporte_estado_proyectado" model="ir.actions.act_window">
+        <field name="name">Reporte estado proyectado</field>
+        <field name="res_model">progomex.reporte_estado_proyectado</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_progomex_reporte_estado_proyectado"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="progomex.model_progomex_reporte_estado_proyectado"/>
+    </record>
+    
+        <menuitem action="action_progomex_reporte_estado_proyectado" id="menu_progomex_reporte_estado_proyectado" parent="account.account_reports_management_menu"/>
+    
+</odoo>

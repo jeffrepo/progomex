@@ -19,24 +19,25 @@
         - Cumplimiento con normativas mexicanas.
     """,
 
-    'author': "SISPAV",
-    'website': "https://www.yourcompany.com",
+    'author': "Jefferson Silva",
+    'website': "https://www.silvatechnologies.odoo.com",
 
     # Categorías
     'category': 'Inventory/Delivery',
-    'version': '0.1',
+    'version': '0.2',
     'license': 'LGPL-3',
 
     # Dependencias
-    'depends': ['base', 'stock', 'delivery', 'l10n_mx_edi_stock_30','hr_expense'],
+    'depends': ['base', 'account','stock', 'delivery', 'l10n_mx_edi_stock_30','hr_expense'],
 
     # Archivos de datos
     'data': [
         # 'security/ir.model.access.csv',
-        'views/views.xml',
         'views/templates.xml',
         'reports/letter_delivery_report.xml',
         'reports/report_action.xml',
         'views/hr_expense_views.xml',
+        'wizard/reporte_wizard_views.xml',
+        'views/progomex_views.xml',
     ]
 }
