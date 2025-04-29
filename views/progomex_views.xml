@@ -1,15 +1,19 @@
 <odoo>
   <data>
       
-        <record model="ir.ui.view" id="view_progomex_gasto_indirecto_form">
-            <field name="name">view.progomex.gasto.indirecto.form</field>
-            <field name="model">progomex.gasto_indirecto</field>
+        <record model="ir.ui.view" id="view_progomex_conf_estado_proyectado_form">
+            <field name="name">view.progomex.cong.estado.proyectado.form</field>
+            <field name="model">progomex.conf_estado_proyectado</field>
             <field name="arch" type="xml">
                 <form string="Gasto indirecto">
                     <group>
                         <field name="sequence" invisible="1"/>
                         <field name="name"/>
+                        <field name="codigo"/>
+                        <field name="calculo"/>
+                        <field name="tipo"/>
                         <field name="cuenta_ids" widget="many2many_tags"/>
+                        <field name="codigo_py"/>
                     </group>
                 </form>
             </field>
@@ -46,9 +50,9 @@
             </field>
         </record>
       
-        <record id="view_progomex_gasto_indirecto_tree" model="ir.ui.view">
-            <field name="name">view.progomex.gasto.indirecto.tree</field>
-            <field name="model">progomex.gasto_indirecto</field>
+        <record id="view_progomex_conf_estado_proyectado_tree" model="ir.ui.view">
+            <field name="name">view.progomex.conf.estado.proyectado.tree</field>
+            <field name="model">progomex.conf_estado_proyectado</field>
             <field name="arch" type="xml">
                 <tree string="Gastos">
                     <field name="sequence" widget="handle"/>
@@ -95,14 +99,14 @@
             </field>
         </record>
       
-        <record id="action_gasto_indirecto" model="ir.actions.act_window">
-            <field name="name">Gastos indirectos</field>
-            <field name="res_model">progomex.gasto_indirecto</field>
+        <record id="action_conf_estado_proyectado" model="ir.actions.act_window">
+            <field name="name">Configuracion estado proyectado</field>
+            <field name="res_model">progomex.conf_estado_proyectado</field>
             <field name="view_mode">tree,form</field>
             <field name="context">{}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
-                    Configura un gasto indirecto
+                    Configura estado proyectado
                 </p>
             </field>
         </record>
@@ -123,9 +127,9 @@
 
         <menuitem action="action_inventario" id="menu_progomex_inventario" name="Inventario" parent="progomex.menu_progomex_reportes"/>
       
-        <menuitem action="action_gasto_indirecto" id="menu_progomex_gasto_indirecto" name="Gastos indirectos" parent="progomex.menu_progomex_reportes"/>
+        <menuitem action="action_conf_estado_proyectado" id="menu_progomex_conf_estado_proyectado" name="Estado proyectado" parent="progomex.menu_progomex_reportes"/>
       
         <menuitem action="action_gasto_administrativo" id="menu_progomex_gasto_administrativo" name="Gastos administrativos" parent="progomex.menu_progomex_reportes"/>
-        
+      
   </data>
 </odoo>

@@ -20,73 +20,124 @@ class ReporteEstadoProyectado(models.TransientModel):
 
     def obtener_gastos_indirectos(self, fecha_inicio, fecha_fin, cuenta_analitica_id):
         gastos_indirectos = {}
+        gastos_indirectos_codigo = {}
+        gastos_indirectos_codigo_total = {}
         gastos_indirectos_opciones = {}
-        gasto_indirecto_ids = self.env['progomex.gasto_indirecto'].search([("id",">", 0)])
+        gasto_indirecto_ids = self.env['progomex.conf_estado_proyectado'].search([("tipo","=", "gasto_indirecto")])
         lista_gastos_ids = []
         total = 0
         if gasto_indirecto_ids:
             for gasto in gasto_indirecto_ids:
+                if gasto.codigo not in gastos_indirectos_codigo:
+                    gastos_indirectos_codigo[gasto.codigo] = {"total": 0, "cuentas": gasto.cuenta_ids.ids if gasto.cuenta_ids else False, "nombre": gasto.name}
+                    gastos_indirectos_codigo_total[gasto.codigo] = 0
                 for cuenta_gasto in gasto.cuenta_ids:
-                    gastos_indirectos_opciones[cuenta_gasto.id] = gasto.name
+                    gastos_indirectos_opciones[cuenta_gasto.id] = {"codigo": gasto.codigo, "nombre": gasto.name}
                 lista_gastos_ids += gasto.cuenta_ids.ids
 
-            linea_analitica_ids = self.env["account.analytic.line"].search([("date",">=",fecha_inicio),("date","<=",fecha_fin),("account_id","=",cuenta_analitica_id.id),("general_account_id","in",lista_gastos_ids)])
+            linea_analitica_ids = self.env["account.analytic.line"].search([("date",">=",fecha_inicio),("date","<=",fecha_fin),("x_plan2_id","=",cuenta_analitica_id.id),("general_account_id","in",lista_gastos_ids)])
+
             if linea_analitica_ids:
                 for linea in linea_analitica_ids:
                     gasto = False
                     if linea.general_account_id.id in gastos_indirectos_opciones:
-                        gasto = gastos_indirectos_opciones[linea.general_account_id.id]
+                        gasto_codigo = gastos_indirectos_opciones[linea.general_account_id.id]["codigo"]
 
-                        if gasto not in gastos_indirectos:
-                            gastos_indirectos[gasto] = 0
+                        # if gasto_codigo not in gastos_indirectos_codigo:
+                        #     gastos_indirectos[gasto_codigo] = 0
+                            
                         monto = linea.amount * -1
-                        gastos_indirectos[gasto] += monto
+                        gastos_indirectos_codigo[gasto_codigo]["total"] += monto
+                        gastos_indirectos_codigo_total[gasto_codigo] += monto
                         total += monto
-        return [gastos_indirectos, total]
+
+        ##apartados con codigo py, neceistamos recorrer de nuevo
+        if gasto_indirecto_ids:
+            for gasto in gasto_indirecto_ids:
+                if gasto.codigo_py:
+                    gasto_codigo = gasto.codigo
+                    localdict = gastos_indirectos_codigo_total
+                    logging.warning("localdict")
+                    safe_eval(gasto.codigo_py, localdict, mode="exec", nocopy=True)
+                    result = localdict.get('result', False)
+                    gastos_indirectos_codigo[gasto_codigo]["total"] = result
+                    gastos_indirectos_codigo_total[gasto_codigo] = result
+                    #datos_inventario[gasto_codigo]["total"] = result
+        logging.warning("fucnion")
+        logging.warning(gastos_indirectos_codigo)
+        return [gastos_indirectos_codigo, gastos_indirectos_codigo_total, total]
 
     def obtener_inventario(self, fecha_inicio, fecha_fin):
         datos_inventario = {}
-        apartado_inventario_id = self.env['progomex.inventario'].search([("id",">", 0)])
+        datos_inventario_nombre = {}
+        apartado_inventario_id = self.env['progomex.conf_estado_proyectado'].search([("tipo","=", "inventario")])
         logging.warning(apartado_inventario_id)
         if apartado_inventario_id:
             for apartado in apartado_inventario_id:
                 nombre_apartado = apartado.codigo
+                apartado_n = apartado.name
                 if nombre_apartado not in datos_inventario:
-                    datos_inventario[nombre_apartado] = {"nombre": apartado.name, "total": 0}
-
+                    #datos_inventario[nombre_apartado] = {"nombre": apartado.name, "total": 0}
+                    datos_inventario[nombre_apartado] = 0
+                    datos_inventario_nombre[nombre_apartado] = {"nombre": apartado_n, "total":0}
                 movimiento = False
                     
-                if apartado.tipo == "inicial_deudor":
+                if apartado.calculo == "inicial_deudor":
                     movimientos = self.env["account.move.line"].search([("account_id","in", apartado.cuenta_ids.ids),("date","<",fecha_inicio)])
                     for m in movimientos:
-                        datos_inventario[nombre_apartado]["total"] += (m.debit - m.credit)
-                elif apartado.tipo == "inicia_acreedor":
+                        datos_inventario[nombre_apartado] += (m.debit - m.credit)
+                elif apartado.calculo == "inicia_acreedor":
                     movimientos = self.env["account.move.line"].search([("account_id","in", apartado.cuenta_ids.ids),("date","<",fecha_inicio)])
                     for m in movimientos:
-                        datos_inventario[nombre_apartado]["total"] += (m.credito - m.debit)
-                elif apartado.tipo == "acumulado_deudor":
+                        datos_inventario[nombre_apartado] += (m.credito - m.debit)
+                elif apartado.calculo == "acumulado_deudor":
                     movimientos = self.env["account.move.line"].search([("account_id","in", apartado.cuenta_ids.ids),("date",">=", fecha_inicio),("date","<=", fecha_fin)])
                     for m in movimientos:
-                        datos_inventario[nombre_apartado]["total"] += (m.debit - m.credit)
+                        datos_inventario[nombre_apartado] += (m.debit - m.credit)
                 elif apartado.tipo == "acumulado_acreedor":
                     movimientos = self.env["account.move.line"].search([("account_id","in", apartado.cuenta_ids.ids),("date",">=", fecha_inicio),("date","<=", fecha_fin)])
                     for m in movimientos:
-                        datos_inventario[nombre_apartado]["total"] += (m.credit - m.debit)
-                # elif apartado.tipo == "balanza_final_deudor":
-                # elif apartado.tipo == "balanza_final_acreedor":
+                        datos_inventario[nombre_apartado] += (m.credit - m.debit)
                 else:
                     if apartado.codigo_py:
-                        movimiento = False
-    #                     logging.warning("calculado")
-    #                     logging.warning(datos_inventario)
-    #                     logging.warning(apartado.codigo_py)
-    #                     localdict = apartado.codigo_py
-    #                     datos_inventario[nombre_apartado]["total"] = safe_eval(apartado.codigo_py, json.loadslocaldict, mode="exec", nocopy=True)
-    # #localdict = {'base_amount': base_amount, 'price_unit': price_unit, 'quantity': quantity, 'product': product_sudo, 'partner': partner, 'company': company}
-    #safe_eval(self.python_compute, localdict, mode="exec", nocopy=True)
-                        
+                        localdict = datos_inventario
+                        logging.warning("localdict")
+                        safe_eval(apartado.codigo_py, localdict, mode="exec", nocopy=True)
+                        result = localdict.get('result', False)
+                        datos_inventario[nombre_apartado] = result
+
+        logging.warning("datos_inventario")
         logging.warning(datos_inventario)
-        return datos_inventario
+        for d in datos_inventario:
+            logging.warning("las d")
+            logging.warning(d)
+            if d not in ["__builtins__","result"]:
+                if d in datos_inventario_nombre:
+                    datos_inventario_nombre[d]["total"] = datos_inventario[d]
+        return [nombre_apartado,datos_inventario_nombre]
+
+
+    def _obtener_final(self, dic_final):
+        gasto_indirecto_ids = self.env['progomex.conf_estado_proyectado'].search([("tipo","=", "valor_final")])
+        final_indirectos_codigo = {}
+        #final_indirectos_codigo_total = {}
+        if gasto_indirecto_ids:
+            for gasto in gasto_indirecto_ids:
+                if gasto.codigo not in final_indirectos_codigo:
+                    final_indirectos_codigo[gasto.codigo] = {"total": 0, "nombre": gasto.name}
+                    dic_final[gasto.codigo] = 0
+            
+            for gasto in gasto_indirecto_ids:
+                if gasto.codigo_py:
+                    gasto_codigo = gasto.codigo
+                    localdict = dic_final
+                    logging.warning("localdict")
+                    safe_eval(gasto.codigo_py, localdict, mode="exec", nocopy=True)
+                    result = localdict.get('result', False)
+                    final_indirectos_codigo[gasto_codigo]["total"] = result
+                    dic_final[gasto_codigo] = result
+        return [final_indirectos_codigo,dic_final]
+        
     
     def print_report_excel(self):
         for w in self:
@@ -104,57 +155,46 @@ class ReporteEstadoProyectado(models.TransientModel):
             hoja.write(3,3,"Estado Proyectado de Costo de Producción y Venta Jose Azueta")
             hoja.write(4,4,"02/28/2025")
 
-
-            # hoja.write(6,0, 'Inventario Inicial de Producción en Proceso')
-            # hoja.write(7,0, 'Inventario Inicial de Materia Prima')
-            # hoja.write(8,0, 'compras de materia prima ')
-            # hoja.write(9,0, 'Gastos de compra de materia prima')
-            # hoja.write(10,0, 'disponible')
-            # hoja.write(11,0, 'Inventario final de materia prima')
-            # hoja.write(12,0, 'costo de la materia prima utilizada')
-            # hoja.write(13,0, 'mano de obra directa')
-            # hoja.write(14,0, 'costo primo')
-
             fila = 6
-            for apartado in inventarios:
-                if "nombre" in inventarios[apartado]:
-                    fila += 1
-                    logging.warning(inventarios[apartado])
-                    hoja.write(fila, 0, inventarios[apartado]["nombre"])
-                    hoja.write(fila, 1, inventarios[apartado]["total"])
+            logging.warning("inventarios")
+            logging.warning(inventarios)
+            for apartado in inventarios[1]:
+                fila += 1
+                if apartado not in ["__builtins__","result"]:
+                    logging.warning(apartado)
+                    logging.warning(inventarios[1][apartado])
+                    hoja.write(fila, 0, inventarios[1][apartado]["nombre"])
+                    hoja.write(fila, 1, inventarios[1][apartado]["total"])
                     
             fila += 2
             hoja.write(fila,0, 'Gastos Indirectos de Producción')
-            for gasto in gastos_indirectos[0]:
-                fila += 1
-                monto = gastos_indirectos[0][gasto]
-                porcentaje = (monto / gastos_indirectos[1])*100
-                decimal = monto
-                hoja.write(fila, 0, gasto)
-                hoja.write(fila, 2, monto)
-                hoja.write(fila, 3, porcentaje)
-
-            fila += 1
-            hoja.write(fila, 3, gastos_indirectos[1])
+            logging.warning("Gastos indirectos")
+            logging.warning(gastos_indirectos[0])
+            for gasto in gastos_indirectos[1]:
+                if gasto not in ["__builtins__","result"]:
+                    fila += 1
+                    nombre_gasto = gastos_indirectos[0][gasto]["nombre"]
+                    monto = gastos_indirectos[0][gasto]["total"]
+                    logging.warning(nombre_gasto)
+                    logging.warning(monto)
+                    porcentaje = (monto / gastos_indirectos[2] if gastos_indirectos[2] > 0 else 0 )*100
+                    hoja.write(fila, 0, nombre_gasto)
+                    hoja.write(fila, 2, monto)
+                #hoja.write(fila, 3, porcentaje)
 
             fila += 2
-            hoja.write(fila,0, 'costo incurrido')
-            fila += 1
-            hoja.write(fila,0, 'costo total de produccion')
-            fila += 1
-            hoja.write(fila,0, 'Inv.  final de produccion en proceso')
-            fila += 1
-            hoja.write(fila,0, 'costo total de produccion terminada')
-            fila += 1
-            hoja.write(fila,0, 'Inv. inicial de producto terminado')
-            fila += 1
-            hoja.write(fila,0, 'Inv. final de producto terminado')
-            fila += 1
-            hoja.write(fila,0, 'costo de ventas')
-            fila += 1
+            #hoja.write(fila, 3, gastos_indirectos[1])
+            dic_final = gastos_indirectos[1] | inventarios[1]
+            apartado_final = self._obtener_final(dic_final)
+            for apartado in apartado_final[0]:
+                if apartado not in ["__builtins__","result"]:
+                    logging.warning("apartado final")
+                    logging.warning(apartado)
+                    hoja.write(fila, 0, apartado_final[0][apartado]["nombre"])
+                    hoja.write(fila, 3, apartado_final[0][apartado]["total"])
+                    fila += 1
+            fila += 2
 
-            
-            
             libro.close()
             datos = base64.b64encode(f.getvalue())
             self.write({'archivo':datos, 'name':'reporte_estado_proyectado.xlsx'})
